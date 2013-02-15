@@ -51,6 +51,11 @@
     <name>Jahia Sitemap</name>
     <packaging>bundle</packaging>
     <description>These are the custom module (Jahia Sitemap) for running on a Jahia server.</description>
+    <scm>
+        <connection>scm:git:git@github.com:Jahia/sitemap.git</connection>
+        <url>scm:git:git@github.com:Jahia/sitemap.git</url>
+        <developerConnection>scm:git:git@github.com:Jahia/sitemap.git</developerConnection>
+    </scm>
     <repositories>
         <repository>
             <id>jahia-public</id>
