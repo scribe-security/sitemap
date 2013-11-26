@@ -9,7 +9,7 @@
             <bean class="org.quartz.CronTrigger">
                 <property name="name" value="SitemapCronTrigger"/>
                 <!-- Will start the process at 4 a.m -->
-                <property name="cronExpression" value="0 0 4 * * ?"/>
+                <property name="cronExpression" value="${sitemapCronExpression:0 0 4 * * ?}"/>
             </bean>
         </property>
         <property name="jobDetail">
