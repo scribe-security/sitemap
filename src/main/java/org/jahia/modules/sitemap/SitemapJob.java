@@ -112,6 +112,7 @@ public class SitemapJob extends QuartzJobBean {
                     logger.debug("Calling " + url.toExternalForm());
                     URLConnection urlConnection = url.openConnection();
                     Source source = new Source(urlConnection);
+                    source.setLogger(null);
                     logger.debug(source.getTextExtractor().toString());
                 } catch (MalformedURLException e) {
                     logger.error(e.getMessage(), e);
