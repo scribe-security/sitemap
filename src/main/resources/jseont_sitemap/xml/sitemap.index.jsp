@@ -44,7 +44,7 @@
                         <c:if test="${not (currentLanguage eq lang) and not functions:contains(inactiveLanguages, lang)}">
                                 <c:set var="replaced" value="/sites/"/>
                                 <c:set var="replacee" value="/${lang}/sites/"/>
-                                <c:url value="${siteMapPath}.xml" var="languageReesource"/>
+                                <c:url value="${siteMapPath}.xml" var="languageResource"/>
                                 <sitemap>
                                         <loc>${url.server}${fn:replace(languageResource, replaced, replacee)}</loc>
                                 </sitemap>
