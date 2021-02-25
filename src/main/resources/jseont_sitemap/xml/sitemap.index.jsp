@@ -18,10 +18,11 @@
 <%--@elvariable id="workspace" type="java.lang.String"--%>
 
 <c:set target="${renderContext}" property="contentType" value="text/xml;charset=UTF-8"/>
+
 <?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        <c:if test="${renderContext.liveMode}">
-                <c:set var="siteMapPath" value="${fn:replace(currentNode.url, '.html', '')}" />
+        <c:if test="${renderContext.liveMode and renderContext.site.defaultLanguage eq renderContext.mainResourceLocale.language}">
+                <c:set var="siteMapPath" value="${currentNode.path}" />
                 <sitemap>
                         <loc>${url.server}<c:url value="${siteMapPath}.xml"/></loc>
                 </sitemap>
@@ -42,20 +43,19 @@
                 <c:set var="currentLanguage" value="${renderContext.site.language}"/>
                 <c:forEach var="lang" items="${languages}">
                         <c:if test="${not (currentLanguage eq lang) and not functions:contains(inactiveLanguages, lang)}">
-                                <c:set var="replaced" value="/sites/"/>
-                                <c:set var="replacee" value="/${lang}/sites/"/>
-                                <c:url value="${siteMapPath}.xml" var="languageResource"/>
+                                <c:url value="${url.getBase(lang.toString())}${siteMapPath}.xml" var="languageResource"/>
                                 <sitemap>
-                                        <loc>${url.server}${fn:replace(languageResource, replaced, replacee)}</loc>
+                                        <loc>${url.server}${languageResource}</loc>
                                 </sitemap>
                         </c:if>
                 </c:forEach>
 
-                <%--  Separate sitemaps for jseont:sitemapResource node option --%>
-                <%-- TODO: replace jnt:page to jseont:sitemapResource once nodetype is available --%>
+                <%--  Separate sitemaps for jseomix:sitemapResource node option --%>
                 <jcr:jqom var="additionalMaps">
-                        <query:selector nodeTypeName="jnt:page" selectorName="stmp"/>
+                        <query:selector nodeTypeName="jseomix:sitemapResource" selectorName="stmp"/>
                         <query:descendantNode path="${renderContext.site.path}" selectorName="stmp"/>
+                        <query:propertyExistence propertyName="createSitemap" selectorName="stmp"/>
+                        <query:equalTo propertyName="createSitemap" value="true"/>
                 </jcr:jqom>
                 <c:forEach var="node" items="${additionalMaps.nodes}">
                         <sitemap>
