@@ -61,4 +61,5 @@ public final class VanityUrls {
         Optional<VanityUrl> url = urls.stream().filter(v -> v.isActive()).findFirst();
         return (url.isPresent()) ? url.get().getUrl() : null;
     }
+
 }

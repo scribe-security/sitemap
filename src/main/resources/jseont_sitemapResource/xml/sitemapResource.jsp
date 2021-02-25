@@ -6,6 +6,7 @@
 <%@ taglib prefix="template" uri="http://www.jahia.org/tags/templateLib" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <%@ taglib prefix="functions" uri="http://www.jahia.org/tags/functions" %>
+<%@ taglib prefix="sitemap" uri="http://www.jahia.org/sitemap" %>
 <%--@elvariable id="currentNode" type="org.jahia.services.content.JCRNodeWrapper"--%>
 <%--@elvariable id="renderContext" type="org.jahia.services.render.RenderContext"--%>
 <%--@elvariable id="`url" type="org.jahia.services.render.URLGenerator"--%>
@@ -19,24 +20,33 @@
 
     <%-- current page node --%>
     <c:set var="urlNode" value="${entryNode}" scope="request"/>
+    <c:set var="renderContext" value="${renderContext}" scope="request"/>
     <jsp:include page="../../common/sitemap-entry.jsp"/>
 
+    <%-- list of parent nodes to exclude --%>
+    <jcr:sql var="excludeNodes"
+         sql="SELECT * FROM [jseomix:sitemapResource]
+            WHERE ISDESCENDANTNODE(['${entryNode.path}'])
+            and [createSitemap]=true"/>
+
     <%-- jnt:page under currentNode --%>
-    <jcr:sql var="childUrlNodes"
-             sql="SELECT * FROM [jnt:page] WHERE ISDESCENDANTNODE('${entryNode.path}')
-             and ([createSitemap] IS NULL or [createSitemap] = false)"/>
+    <c:set var="childUrlNodes" value="${sitemap:getSitemapEntries(renderContext, entryNode.path, 'jnt:page')}"/>
     <c:forEach items="${childUrlNodes.nodes}" var="childUrlNode">
-        <c:set var="urlNode" value="${childUrlNode}" scope="request"/>
-        <jsp:include page="../../common/sitemap-entry.jsp"/>
+        <c:if test="${!sitemap:excludeNode(childUrlNode, excludeNodes.nodes)}">
+            <c:set var="urlNode" value="${childUrlNode}" scope="request"/>
+            <c:set var="renderContext" value="${renderContext}" scope="request"/>
+            <jsp:include page="../../common/sitemap-entry.jsp"/>
+        </c:if>
     </c:forEach>
 
     <%-- jmix:mainResource under currentNode --%>
-    <jcr:sql var="childUrlNodes"
-             sql="SELECT * FROM [jmix:mainResource] WHERE ISDESCENDANTNODE('${entryNode.path}')
-             and ([createSitemap] IS NULL or [createSitemap] = false)"/>
+    <c:set var="childUrlNodes" value="${sitemap:getSitemapEntries(renderContext, entryNode.path, 'jmix:mainResource')}"/>
     <c:forEach items="${childUrlNodes.nodes}" var="childUrlNode">
-        <c:set var="urlNode" value="${childUrlNode}" scope="request"/>
-        <jsp:include page="../../common/sitemap-entry.jsp"/>
+        <c:if test="${!sitemap:excludeNode(childUrlNode, excludeNodes.nodes)}">
+            <c:set var="urlNode" value="${childUrlNode}" scope="request"/>
+            <c:set var="renderContext" value="${renderContext}" scope="request"/>
+            <jsp:include page="../../common/sitemap-entry.jsp"/>
+        </c:if>
     </c:forEach>
 
 </urlset>
