@@ -89,16 +89,18 @@ public class SitemapBackgroundJob extends BackgroundJob {
         final List<String> siteMaps = (List<String>) jobDataMap.get(SITEMAP_URLS);
         logger.debug("Search engines: {}", searchEngines);
         logger.debug("Sitemap urls: {}", siteMaps);
-        for (String siteMap : siteMaps) {
-            for (String s : searchEngines) {
-                try {
-                    URL url = new URL(s + URLEncoder.encode(siteMap, CHAR_ENCODING));
-                    logger.debug("Calling {}", url.toExternalForm());
-                    URLConnection urlConnection = url.openConnection();
-                    Source source = new Source(urlConnection);
-                    logger.debug(source.getTextExtractor().toString());
-                } catch (IOException e) {
-                    logger.error(e.getMessage(), e);
+        if (!siteMaps.isEmpty() && !searchEngines.isEmpty()) {
+            for (String siteMap : siteMaps) {
+                for (String s : searchEngines) {
+                    try {
+                        URL url = new URL(s + URLEncoder.encode(siteMap, CHAR_ENCODING));
+                        logger.debug("Calling {}", url.toExternalForm());
+                        URLConnection urlConnection = url.openConnection();
+                        Source source = new Source(urlConnection);
+                        logger.debug(source.getTextExtractor().toString());
+                    } catch (IOException e) {
+                        logger.error(e.getMessage(), e);
+                    }
                 }
             }
         }

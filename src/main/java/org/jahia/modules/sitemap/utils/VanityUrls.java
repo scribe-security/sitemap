@@ -24,13 +24,18 @@
 package org.jahia.modules.sitemap.utils;
 
 import org.apache.commons.lang.StringUtils;
+import org.jahia.modules.sitemap.config.ConfigService;
+import org.jahia.modules.sitemap.config.impl.ConfigServiceImpl;
+import org.jahia.osgi.FrameworkService;
 import org.jahia.services.content.JCRNodeWrapper;
-import org.jahia.services.query.QueryResultWrapper;
 import org.jahia.services.seo.VanityUrl;
 import org.jahia.services.seo.jcr.VanityUrlManager;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
+import org.osgi.service.component.annotations.Component;
 
 import javax.jcr.RepositoryException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,4 +67,26 @@ public final class VanityUrls {
         return (url.isPresent()) ? url.get().getUrl() : null;
     }
 
+    public static List<String> getSearchEngines() {
+        return getConfigService().getSearchEngines();
+    }
+
+    public static List<String> getIncludedContentTypes() {
+        return getConfigService().getIncludeContentTypes();
+    }
+
+    public static List<String> getSitemapUrls() {
+        return getConfigService().getSitemapUrls();
+    }
+
+    public static long getJobFrequency() {
+        return getConfigService().getJobFrequency();
+    }
+
+    private static ConfigService getConfigService() {
+        final BundleContext bundleContext = FrameworkUtil.getBundle(ConfigService.class).getBundleContext();
+        final ServiceReference<ConfigService> serviceReference = FrameworkService.getBundleContext()
+                .getServiceReference(ConfigService.class);
+        return bundleContext.getService(serviceReference);
+    }
 }
