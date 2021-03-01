@@ -47,7 +47,7 @@ import static org.jahia.modules.sitemap.constant.SitemapConstant.SEARCH_ENGINES;
 import static org.jahia.modules.sitemap.constant.SitemapConstant.SITEMAP_URLS;
 
 /**
- * Short description of the class
+ * Simple background job
  *
  * @author nonico
  */
@@ -89,6 +89,12 @@ public class SitemapBackgroundJob extends BackgroundJob {
         final List<String> siteMaps = (List<String>) jobDataMap.get(SITEMAP_URLS);
         logger.debug("Search engines: {}", searchEngines);
         logger.debug("Sitemap urls: {}", siteMaps);
+        if (siteMaps.isEmpty()) {
+            logger.warn("There are not entries found in the configuration: sitemap.site-urls");
+        }
+        if (searchEngines.isEmpty()) {
+            logger.warn("There are not entries found in the configuration: sitemap.search-engines");
+        }
         if (!siteMaps.isEmpty() && !searchEngines.isEmpty()) {
             for (String siteMap : siteMaps) {
                 for (String s : searchEngines) {
