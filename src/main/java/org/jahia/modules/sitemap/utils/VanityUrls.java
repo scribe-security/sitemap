@@ -58,7 +58,7 @@ public final class VanityUrls {
     }
 
     private static String getActiveUrl(List<VanityUrl> urls) {
-        Optional<VanityUrl> url = urls.stream().filter(v -> v.isActive()).findFirst();
+        Optional<VanityUrl> url = urls.stream().filter(v -> v.isDefaultMapping() && v.isActive()).findFirst();
         return (url.isPresent()) ? url.get().getUrl() : null;
     }
 
