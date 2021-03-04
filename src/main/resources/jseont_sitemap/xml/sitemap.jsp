@@ -25,8 +25,7 @@
             and [createSitemap]=true"/>
 
     <%-- jnt:page under currentNode --%>
-    <c:set var="childUrlNodes" value="${sitemap:getSitemapEntries(renderContext, entryNode.path, 'jnt:page')}"/>
-    <c:forEach items="${childUrlNodes.nodes}" var="childUrlNode">
+    <c:forEach var="childUrlNode" items="${sitemap:getSitemapEntries(renderContext, entryNode.path, 'jnt:page')}">
         <c:if test="${!sitemap:excludeNode(childUrlNode, excludeNodes.nodes)}">
             <c:set var="urlNode" value="${childUrlNode}" scope="request"/>
             <c:set var="renderContext" value="${renderContext}" scope="request"/>
@@ -35,8 +34,7 @@
     </c:forEach>
 
     <%-- jmix:mainResource under currentNode --%>
-    <c:set var="childUrlNodes" value="${sitemap:getSitemapEntries(renderContext, entryNode.path, 'jmix:mainResource')}"/>
-    <c:forEach items="${childUrlNodes.nodes}" var="childUrlNode">
+    <c:forEach var="childUrlNode" items="${sitemap:getSitemapEntries(renderContext, entryNode.path, 'jmix:mainResource')}">
         <c:if test="${!sitemap:excludeNode(childUrlNode, excludeNodes.nodes)}">
             <c:set var="urlNode" value="${childUrlNode}" scope="request"/>
             <c:set var="renderContext" value="${renderContext}" scope="request"/>
