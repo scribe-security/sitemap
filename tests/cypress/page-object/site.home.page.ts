@@ -1,20 +1,26 @@
 import { BasePage } from './base.page'
 import { editPage } from './edit.page'
+import { workflowDashboard } from './worflow.dashboard.page'
 
 class SiteHomePage extends BasePage {
     elements = {
         iframePageComposerFrame: 'iframe[id="page-composer-frame"]',
         iframeNestedSrcEditFrame: 'iframe[src*="editframe"]',
-
         divRoleRow: 'div[role="row"]',
         imgVirtualSite: 'img[src*="jnt_virtualsite"]',
-
-        textEdit: 'Edit',
+        publishSiteinAllLang: "[class*='publishsiteinalllanguages']",
+        editSite: "[class*='editcontentroot']",
+        cacheButton: '.edit-menu-cache',
+        flushAll: "[class*='flushall']",
     }
 
     goTo(siteHomeUrl: string) {
         cy.goTo(siteHomeUrl)
-        // Stabilize the nested iframe loading
+        this.waitForPageLoad()
+        return this
+    }
+
+    waitForPageLoad() {
         this.getIframeElement(this.elements.iframePageComposerFrame, this.elements.iframeNestedSrcEditFrame)
 
         this.getSiteIframeBody(this.elements.iframeNestedSrcEditFrame, '0.contentDocument.body')
@@ -32,8 +38,26 @@ class SiteHomePage extends BasePage {
             .rightclick()
             .should('have.class', 'context-menu-open')
 
-        this.getIframeBody().contains(this.htmlElements.span, this.elements.textEdit).click()
+        this.getIframeBody().find(this.elements.editSite).click()
         return editPage
+    }
+
+    publishSite(site) {
+        this.getIframeBody()
+            .contains('div[role="row"]', site)
+            .trigger('mouseover') // Stabilize portion right before the right-click so it hover over the right element
+            .rightclick()
+            .should('have.class', 'context-menu-open')
+        this.getIframeBody().find(this.elements.publishSiteinAllLang).click()
+        return workflowDashboard
+    }
+
+    flushCache() {
+        this.getIframeBody().find(this.elements.cacheButton).click()
+        this.getIframeBody().find(this.elements.flushAll).click()
+        // make sure we get success message before continuing
+        this.containPageComposerIframeElement('.x-info-body', 'All caches have been flushed')
+        return this
     }
 }
 
