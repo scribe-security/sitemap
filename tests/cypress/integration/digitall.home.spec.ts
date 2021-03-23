@@ -6,9 +6,10 @@ describe('Sitemap 4.0.0', () => {
             .goTo('/jahia/page-composer/default/en/sites/digitall/home.html')
             .editPage('Digitall')
             .clickOnSitemap()
+            .clickOnSave()
             .validateSucessMessage()
             .clickBack()
-            .publishSite('Digitall')
+            .publishAllSite('Digitall')
             .clickPublishAll()
             .flushCache()
 
