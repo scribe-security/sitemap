@@ -106,6 +106,14 @@ public class ConfigServiceImpl implements ConfigService {
         return new ArrayList<>(Arrays.asList(includedContentTypes.split(",")));
     }
 
+    /** @return sitemap file cache duration in ms
+     * @see org.jahia.modules.sitemap.filter.SitemapCacheFilter */
+    @Override public long getCacheDuration() {
+        String configKey = String.format(PROP_FORMAT, SITEMAP_PARENT_PROPERTY, DOT, CACHE_DURATION);
+        final String cacheDurationStr = properties.getOrDefault(configKey,"4"); // default 4 hour cache duration
+        return convertFromHour(Long.parseLong(cacheDurationStr));
+    }
+
     private long convertFromHour(long jobFrequency) {
         return TimeUnit.HOURS.toMillis(jobFrequency);
     }
