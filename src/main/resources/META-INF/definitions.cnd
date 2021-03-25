@@ -4,8 +4,10 @@
 <jmix = 'http://www.jahia.org/jahia/mix/1.0'>
 
 [jseont:sitemap] > jnt:content
+ + * (jnt:file)
 
 [jseont:sitemapResource] > jnt:content
+ + * (jnt:file)
 
 [jseomix:sitemap] mixin
  extends = jnt:virtualsite
