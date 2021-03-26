@@ -111,7 +111,8 @@ public class ConfigServiceImpl implements ConfigService {
     @Override public long getCacheDuration() {
         String configKey = String.format(PROP_FORMAT, SITEMAP_PARENT_PROPERTY, DOT, CACHE_DURATION);
         final String cacheDurationStr = properties.getOrDefault(configKey,"4"); // default 4 hour cache duration
-        return convertFromHour(Long.parseLong(cacheDurationStr));
+        long cacheDuration = Long.parseLong(cacheDurationStr);
+        return convertFromHour(Math.min(0, cacheDuration));
     }
 
     private long convertFromHour(long jobFrequency) {

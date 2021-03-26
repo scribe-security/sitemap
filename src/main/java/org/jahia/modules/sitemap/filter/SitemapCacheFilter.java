@@ -26,6 +26,7 @@ package org.jahia.modules.sitemap.filter;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.api.Constants;
+import org.jahia.modules.sitemap.utils.CacheUtils;
 import org.jahia.modules.sitemap.utils.ConfigServiceUtils;
 import org.jahia.services.cache.CacheHelper;
 import org.jahia.services.content.JCRCallback;
@@ -47,8 +48,6 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * Filter that creates sitemap file nodes for caching.
@@ -64,9 +63,6 @@ public class SitemapCacheFilter extends AbstractFilter {
     private static final Logger logger = LoggerFactory.getLogger(SitemapCacheFilter.class);
 
     private static final long EXPIRATION = ConfigServiceUtils.getCacheDuration();
-
-    /** Node name prefix for sitemap file caches */
-    private static final String CACHE_NAME = "sitemap-cache";
 
     /** Session attribute flag to check in the sitemap views whether view needs to re-render or not */
     private static final String RENDER_FLAG_ATTR = "refreshSitemapSession";
@@ -89,7 +85,7 @@ public class SitemapCacheFilter extends AbstractFilter {
         if (!needsCaching(resource)) return null;
 
         JCRNodeWrapper cacheNode = getCacheNode(resource.getNode());
-        boolean refreshSitemap = (cacheNode == null) || isExpired(cacheNode);
+        boolean refreshSitemap = (cacheNode == null) || CacheUtils.isExpired(cacheNode, EXPIRATION);
         renderContext.getRequest().getSession().setAttribute(RENDER_FLAG_ATTR, refreshSitemap);
         if (refreshSitemap) { // manually flush jahia cache prior to render
             CacheHelper.flushOutputCachesForPath(resource.getPath(), false);
@@ -97,6 +93,10 @@ public class SitemapCacheFilter extends AbstractFilter {
         return null;
     }
 
+    /**
+     * If refresh flag is set from prepare(), then we create/refresh file cache with rendered contents.
+     * Otherwise, serve file cache contents
+     */
     @Override
     public String execute(String previousOut, RenderContext renderContext, Resource resource, RenderChain chain)
             throws RepositoryException
@@ -114,8 +114,7 @@ public class SitemapCacheFilter extends AbstractFilter {
             } else {
                 JCRNodeWrapper cacheNode = getCacheNode(sitemapNode);
                 inputStream = cacheNode.getFileContent().downloadFile();
-                String out = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
-                return out;
+                return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             }
         } catch (IOException e) {
             logger.error("Unable to read sitemap file cache contents.");
@@ -150,7 +149,8 @@ public class SitemapCacheFilter extends AbstractFilter {
 
     /** Apply file caching only for default template */
     public boolean needsCaching(Resource resource) {
-        return "default".equalsIgnoreCase(resource.getTemplate());
+        String templateName = resource.getTemplate();
+        return "default".equalsIgnoreCase(templateName);
     }
 
     public JCRNodeWrapper getCacheNode(JCRNodeWrapper node) throws RepositoryException {
@@ -160,14 +160,7 @@ public class SitemapCacheFilter extends AbstractFilter {
     }
 
     public String getCacheName(JCRNodeWrapper node) {
-        return CACHE_NAME + "-" + node.getLanguage();
-    }
-
-    private boolean isExpired(JCRNodeWrapper cacheNode) {
-        long exp = EXPIRATION;
-        Date lastModified = cacheNode.getContentLastModifiedAsDate();
-        long expirationInMs = lastModified.getTime() + exp;
-        return System.currentTimeMillis() > expirationInMs;
+        return CacheUtils.CACHE_NAME + "-" + node.getLanguage();
     }
 
 }

@@ -25,6 +25,7 @@ package org.jahia.modules.sitemap.job;
 
 import net.htmlparser.jericho.Source;
 import org.jahia.modules.sitemap.config.ConfigService;
+import org.jahia.modules.sitemap.utils.CacheUtils;
 import org.jahia.services.scheduler.BackgroundJob;
 import org.jahia.services.scheduler.SchedulerService;
 import org.jahia.settings.SettingsBean;
@@ -36,6 +37,7 @@ import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.jcr.RepositoryException;
 import java.io.IOException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -83,7 +85,7 @@ public class SitemapBackgroundJob extends BackgroundJob {
         }
     }
 
-    @Override public void executeJahiaJob(JobExecutionContext jobExecutionContext) {
+    @Override public void executeJahiaJob(JobExecutionContext jobExecutionContext) throws RepositoryException {
         final JobDataMap jobDataMap = jobExecutionContext.getJobDetail().getJobDataMap();
         final List<String> searchEngines = (List<String>) jobDataMap.get(SEARCH_ENGINES);
         final List<String> siteMaps = (List<String>) jobDataMap.get(SITEMAP_URLS);
@@ -95,7 +97,9 @@ public class SitemapBackgroundJob extends BackgroundJob {
         if (searchEngines.isEmpty()) {
             logger.warn("There are not entries found in the configuration: sitemap.search-engines");
         }
+
         if (!siteMaps.isEmpty() && !searchEngines.isEmpty()) {
+            CacheUtils.refreshSitemapCache(15*60000);
             for (String siteMap : siteMaps) {
                 for (String s : searchEngines) {
                     try {

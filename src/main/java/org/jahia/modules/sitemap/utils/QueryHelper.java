@@ -23,9 +23,8 @@
  */
 package org.jahia.modules.sitemap.utils;
 
-import org.jahia.services.content.JCRNodeWrapper;
-import org.jahia.services.content.JCRSessionFactory;
-import org.jahia.services.content.JCRSessionWrapper;
+import org.jahia.api.Constants;
+import org.jahia.services.content.*;
 import org.jahia.services.render.RenderContext;
 
 import javax.jcr.NodeIterator;
@@ -79,7 +78,7 @@ public final class QueryHelper {
         return result;
     }
 
-    private static QueryResult getQuery(JCRSessionWrapper session, String query) {
+    public static QueryResult getQuery(JCRSessionWrapper session, String query) {
         try {
             return session.getWorkspace().getQueryManager()
                     .createQuery(query, Query.JCR_SQL2).execute();
