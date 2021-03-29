@@ -13,6 +13,7 @@
 
 <c:set var="entryNode" value="${renderContext.site}"/>
 
+<%-- node check type to make sure sitemap is not enabled then disabled --%>
 <c:if test="${entryNode.isNodeType('jseomix:sitemap')}">
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"

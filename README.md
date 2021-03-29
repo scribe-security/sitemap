@@ -29,6 +29,7 @@ The submission of your sitemap can be done automatically by a background job in 
 located at `${jahia.deploy.targetServerDirectory}/digital-factory-data/karaf/etc` called `org.jahia.modules.sitemap.config.impl.ConfigServiceImpl.cfg`.
 
     sitemap.job-frequency=24
+    # sitemap.cache-duration=4
     # Comma separated values
     sitemap.search-engines=http://www.google.com/webmasters/tools/ping?sitemap=
     # Comma separated values
@@ -38,12 +39,17 @@ located at `${jahia.deploy.targetServerDirectory}/digital-factory-data/karaf/etc
 
 At the moment, the configuration has 3 keys. 
 * Job Frequency
+* Cache Duration  
 * List of Search engines
 * List of sitemap urls
 
 ### Job frequency
 This value determines how often to send the sitemap url to the search engines. The base unit is in hours - thus a value of 24 means the 
 background job will run every 24 hours.
+
+### Cache duration
+This value determines how often to remove and refresh the file cache for sitemap.xml contents specified in hours. Cache expiration 
+defaults to 4 hours if no value is set.
 
 ### List of Search engines
 This is a comma-separated value of the list of search engines to use by the background job.

@@ -34,9 +34,9 @@ public interface ConfigService {
 
     void setProperties(Map<String,String> properties);
     long getJobFrequency();
+    long getCacheDuration();
     List<String> getSearchEngines();
     List<String> getSitemapUrls();
     List<String> getIncludeContentTypes();
-
 
 }
