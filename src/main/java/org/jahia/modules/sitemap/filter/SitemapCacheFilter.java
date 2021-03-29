@@ -44,7 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.RepositoryException;
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -64,9 +63,6 @@ public class SitemapCacheFilter extends AbstractFilter {
 
     private static final long EXPIRATION = ConfigServiceUtils.getCacheDuration();
 
-    /** Session attribute flag to check in the sitemap views whether view needs to re-render or not */
-    private static final String RENDER_FLAG_ATTR = "refreshSitemapSession";
-
 
     @Activate
     public void activate() {
@@ -74,28 +70,35 @@ public class SitemapCacheFilter extends AbstractFilter {
         setApplyOnNodeTypes("jseont:sitemapResource,jseont:sitemap");
         setApplyOnModes("live");
         setDescription("Filter for creating sitemap file nodes for caching");
-        logger.debug("Activated FileCacheFilter");
+        logger.debug("Activated SitemapCacheFilter");
     }
 
     /**
-     * Check if view needs to be re-rendered or not and add a session flag that the view can then check to determine that logic.
-     * Also flush cache here if view needs to be re-rendered.
+     * Serve cache contents if cache exists and is not expired. Otherwise, flush sitemap cache and re-render
      */
     @Override public String prepare(RenderContext renderContext, Resource resource, RenderChain chain) throws Exception {
         if (!needsCaching(resource)) return null;
 
         JCRNodeWrapper cacheNode = getCacheNode(resource.getNode());
-        boolean refreshSitemap = (cacheNode == null) || CacheUtils.isExpired(cacheNode, EXPIRATION);
-        renderContext.getRequest().getSession().setAttribute(RENDER_FLAG_ATTR, refreshSitemap);
-        if (refreshSitemap) { // manually flush jahia cache prior to render
-            CacheHelper.flushOutputCachesForPath(resource.getPath(), false);
+        InputStream inputStream = null;
+        try {
+            if (isValidCache(cacheNode)) {
+                inputStream = cacheNode.getFileContent().downloadFile();
+                return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+            }
+        } catch (IOException e) { // something happened; re-render
+            logger.error("Unable to read sitemap file cache contents.");
+        } finally {
+            IOUtils.closeQuietly(inputStream);
         }
+
+        // re-render by returning null; manually flush jahia cache prior to render
+        CacheHelper.flushOutputCachesForPath(resource.getPath(), false);
         return null;
     }
 
     /**
-     * If refresh flag is set from prepare(), then we create/refresh file cache with rendered contents.
-     * Otherwise, serve file cache contents
+     * Create/refresh file cache with rendered contents (previousOut) if needed.
      */
     @Override
     public String execute(String previousOut, RenderContext renderContext, Resource resource, RenderChain chain)
@@ -104,25 +107,20 @@ public class SitemapCacheFilter extends AbstractFilter {
         if (!needsCaching(resource)) return previousOut;
 
         JCRNodeWrapper sitemapNode = resource.getNode();
-        boolean refreshSitemap = (Boolean) renderContext.getRequest().getSession().getAttribute(RENDER_FLAG_ATTR);
+        JCRNodeWrapper cacheNode = getCacheNode(sitemapNode);
+
         InputStream inputStream = null;
         try {
-            if (refreshSitemap && StringUtils.isNotBlank(previousOut)) {
+            // refresh if invalid cache; cache only if there's contents
+            if (!isValidCache(cacheNode) && StringUtils.isNotBlank(previousOut)) {
                 inputStream = IOUtils.toInputStream(previousOut, StandardCharsets.UTF_8);
                 refreshSitemapCache(sitemapNode, inputStream);
-                return previousOut;
-            } else {
-                JCRNodeWrapper cacheNode = getCacheNode(sitemapNode);
-                inputStream = cacheNode.getFileContent().downloadFile();
-                return IOUtils.toString(inputStream, StandardCharsets.UTF_8);
             }
-        } catch (IOException e) {
-            logger.error("Unable to read sitemap file cache contents.");
-            renderContext.getResponse().setStatus(HttpServletResponse.SC_NOT_FOUND);
-            return null;
         } finally {
             IOUtils.closeQuietly(inputStream);
         }
+
+        return previousOut;
     }
 
     /**
@@ -153,14 +151,18 @@ public class SitemapCacheFilter extends AbstractFilter {
         return "default".equalsIgnoreCase(templateName);
     }
 
-    public JCRNodeWrapper getCacheNode(JCRNodeWrapper node) throws RepositoryException {
-        if (node == null) return null;
-        String cacheName = getCacheName(node);
-        return (node.hasNode(cacheName)) ? node.getNode(cacheName) : null;
+    public boolean isValidCache(JCRNodeWrapper cacheNode) {
+        return (cacheNode != null) && !CacheUtils.isExpired(cacheNode, EXPIRATION);
     }
 
-    public String getCacheName(JCRNodeWrapper node) {
-        return CacheUtils.CACHE_NAME + "-" + node.getLanguage();
+    public JCRNodeWrapper getCacheNode(JCRNodeWrapper sitemapNode) throws RepositoryException {
+        if (sitemapNode == null) return null;
+        String cacheName = getCacheName(sitemapNode);
+        return (sitemapNode.hasNode(cacheName)) ? sitemapNode.getNode(cacheName) : null;
+    }
+
+    public String getCacheName(JCRNodeWrapper sitemapNode) {
+        return CacheUtils.CACHE_NAME + "-" + sitemapNode.getLanguage();
     }
 
 }
