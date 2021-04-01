@@ -35,7 +35,7 @@ located at `${jahia.deploy.targetServerDirectory}/digital-factory-data/karaf/etc
     # Comma separated values
     sitemap.sitemap-urls="https://example.com/sitemap.xml,https://example.com/sitemap2.xml"
     # comma separated values
-    sitemap.included-content-types=jnt:pages,jnt:mainResource,jmix:sitemap
+    sitemap.included-content-types=jnt:page,jmix:mainResource,jmix:sitemap
 
 At the moment, the configuration has 3 keys. 
 * Job Frequency
