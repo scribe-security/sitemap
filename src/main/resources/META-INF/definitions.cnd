@@ -15,12 +15,20 @@
  - sitemapCacheDuration (string) = '' autocreated
  + sitemap (jseont:sitemap) = jseont:sitemap mandatory autocreated
 
+// dedicated sitemap
 [jseomix:sitemapResource] mixin
  extends = jnt:page, jmix:mainResource
- - noIndex (boolean)
- - noFollow (boolean)
- - createSitemap (boolean)
+ itemtype = seo
  + sitemap (jseont:sitemapResource) = jseont:sitemapResource mandatory autocreated
+
+[jseomix:noIndex] mixin
+ extends = jnt:page, jmix:mainResource
+ itemtype = seo
+
+[jseomix:noFollow] mixin
+ extends = jnt:page, jmix:mainResource
+ itemtype = seo
+
 
 // Legacy definition kept for backward compatibility
 
