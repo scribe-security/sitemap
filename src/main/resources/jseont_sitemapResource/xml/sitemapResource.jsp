@@ -13,7 +13,7 @@
 
 <c:set var="entryNode" value="${currentNode.parent}"/>
 
-<c:if test="${entryNode.properties['createSitemap'].boolean}">
+<c:if test="${entryNode.isNodeType('jseomix:sitemapResource')}">
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="https://www.w3.org/1999/xhtml">
@@ -26,8 +26,7 @@
     <%-- list of parent nodes to exclude --%>
     <jcr:sql var="excludeNodes"
          sql="SELECT * FROM [jseomix:sitemapResource]
-            WHERE ISDESCENDANTNODE(['${entryNode.path}'])
-            and [createSitemap]=true"/>
+            WHERE ISDESCENDANTNODE(['${entryNode.path}'])"/>
 
     <%-- jnt:page under currentNode --%>
     <c:forEach var="childUrlNode" items="${sitemap:getSitemapEntries(renderContext, entryNode.path, 'jnt:page')}">

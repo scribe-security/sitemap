@@ -22,13 +22,13 @@ import java.util.List;
 public class RobotsFilter extends AbstractFilter {
     public static final Logger logger = LoggerFactory.getLogger(RobotsFilter.class);
 
-    private static final String NO_FOLLOW_PROP = "noFollow";
-    private static final String NO_INDEX_PROP = "noIndex";
+    private static final String NO_FOLLOW_MIXIN = "jseomix:noFollow";
+    private static final String NO_INDEX_MIXIN = "jseomix:noIndex";
 
     @Activate
     public void activate() {
         setPriority(15.1f); //Priority before cache filter
-        setApplyOnNodeTypes("jseomix:sitemapResource");
+        setApplyOnNodeTypes(String.format("%s,%s", NO_FOLLOW_MIXIN, NO_INDEX_MIXIN));
         setApplyOnModes("preview,live");
         setDescription("Responsible for handling 'nofollow' and 'noindex' attributes of <meta name='robots'/> tag.");
         logger.debug("Activated RobotsFilter");
@@ -47,11 +47,11 @@ public class RobotsFilter extends AbstractFilter {
         StringBuilder tag = new StringBuilder("<meta name=\"robots\"");
         StringBuilder content = new StringBuilder();
 
-        if (node.hasProperty(NO_FOLLOW_PROP) && node.getProperty(NO_FOLLOW_PROP).getBoolean()) {
+        if (node.isNodeType(NO_FOLLOW_MIXIN)) {
             content.append("nofollow");
         }
 
-        if (node.hasProperty(NO_INDEX_PROP) && node.getProperty(NO_INDEX_PROP).getBoolean()) {
+        if (node.isNodeType(NO_INDEX_MIXIN)) {
             if (content.length() != 0) {
                 content.append(",");
             }

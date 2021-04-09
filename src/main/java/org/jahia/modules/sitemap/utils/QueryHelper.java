@@ -23,7 +23,6 @@
  */
 package org.jahia.modules.sitemap.utils;
 
-import org.jahia.api.Constants;
 import org.jahia.services.content.*;
 import org.jahia.services.render.RenderContext;
 
@@ -37,6 +36,8 @@ import java.util.*;
  * Utility helper class for Sitemap
  */
 public final class QueryHelper {
+
+    private static final String DEDICATED_SITEMAP_MIXIN = "jseomix:sitemapResource";
 
     private QueryHelper() {}
 
@@ -54,14 +55,15 @@ public final class QueryHelper {
      * @return sitemap entries that are publicly accessible
      */
     public static List<JCRNodeWrapper> getSitemapEntries(RenderContext ctx, String rootPath, String nodeType) throws RepositoryException {
-        String query = "SELECT * FROM [%s] WHERE ISDESCENDANTNODE('%s') and ([createSitemap] IS NULL or [createSitemap]=false)";
+        String query = "SELECT * FROM [%s] WHERE ISDESCENDANTNODE('%s')";
         QueryResult queryResult = getQuery(ctx.getSite().getSession(), String.format(query, nodeType, rootPath));
 
         Set<String> inclPaths = getGuestNodes(rootPath, nodeType);
         List<JCRNodeWrapper> result = new LinkedList<>();
         for (NodeIterator iter = queryResult.getNodes(); iter.hasNext(); ) {
             JCRNodeWrapper n = (JCRNodeWrapper) iter.nextNode();
-            if (inclPaths.contains(n.getPath())) result.add(n);
+            boolean isPublic = inclPaths.contains(n.getPath());
+            if (isPublic && !n.isNodeType(DEDICATED_SITEMAP_MIXIN)) result.add(n);
         }
         return result;
     }

@@ -22,8 +22,7 @@
     <%-- list of parent nodes to exclude --%>
     <jcr:sql var="excludeNodes"
          sql="SELECT * FROM [jseomix:sitemapResource]
-            WHERE ISDESCENDANTNODE(['${entryNode.path}'])
-            and [createSitemap]=true"/>
+            WHERE ISDESCENDANTNODE(['${entryNode.path}'])"/>
 
     <%-- jnt:page under currentNode --%>
     <c:forEach var="childUrlNode" items="${sitemap:getSitemapEntries(renderContext, entryNode.path, 'jnt:page')}">

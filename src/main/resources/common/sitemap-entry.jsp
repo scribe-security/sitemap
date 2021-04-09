@@ -6,7 +6,7 @@
 <c:set var="renderContext" value="${requestScope['renderContext']}"/>
 <c:set var="urlNode" value="${requestScope['urlNode']}"/>
 
-<c:if test="${!urlNode.properties['noIndex'].boolean}">
+<c:if test="${!urlNode.isNodeType('jseomix:noIndex')}">
 <url>
     <c:url var="vanityUrl" value="${sitemap:getLocaleVanityUrl(urlNode, renderContext.site.language)}"/>
     <c:url var="localeUrl" value="${url.getBase(renderContext.site.language)}${urlNode.path}.html"/>
