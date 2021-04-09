@@ -36,8 +36,7 @@ abstract class Scroller extends ScrollableQueryCallback<Void> {
         }
 
         if (node.isNodeType("jnt:page") || node.isNodeType("jmix:mainResource")) {
-            node.addMixin("jseomix:sitemapResource");
-            node.setProperty("noIndex", true);
+            node.addMixin("jseomix:noIndex");
         }
     }
 }

@@ -8,20 +8,13 @@ class EditPage extends BasePage {
         message: '#message-id',
         back: "[data-sel-role='backButton']",
 
-        seoSitemap: "[id='jseomix:sitemapResource']",
-        dedicatedSitemap: "[id='jseomix:sitemapResource_createSitemap']",
-        noIndexSitemap: "[id='jseomix:sitemapResource_noIndex']",
+        dedicatedSitemap: "[id='jseomix:sitemapResource']",
+        noIndexSitemap: "[id='jseomix:noIndex']",
     }
 
     clickOnSitemap() {
         cy.get(this.elements.sitemap).click()
         cy.get(this.elements.sitemap).should('be.checked')
-        return this
-    }
-
-    clickOnSEOSitemap() {
-        cy.get(this.elements.seoSitemap).click()
-        cy.get(this.elements.seoSitemap).should('be.checked')
         return this
     }
 
