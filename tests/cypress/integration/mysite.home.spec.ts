@@ -85,7 +85,6 @@ describe('Enable sitemap on MySite', () => {
         // Need to enable SEO on "Search Result"
         siteHomePage
             .editPage('Search Results')
-            .clickOnSEOSitemap()
             .clickOnDedicatedSitemap()
             .clickOnSave()
             .validateSucessMessage()
@@ -142,7 +141,6 @@ describe('Enable sitemap on MySite', () => {
         // Need to enable SEO on "Search Result"
         siteHomePage
             .editPage('Search Results')
-            .clickOnSEOSitemap()
             .clickOnNoIndexSitemap()
             .clickOnSave()
             .validateSucessMessage()

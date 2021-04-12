@@ -55,8 +55,6 @@
                 <jcr:jqom var="additionalMaps">
                         <query:selector nodeTypeName="jseomix:sitemapResource" selectorName="stmp"/>
                         <query:descendantNode path="${renderContext.site.path}" selectorName="stmp"/>
-                        <query:propertyExistence propertyName="createSitemap" selectorName="stmp"/>
-                        <query:equalTo propertyName="createSitemap" value="true"/>
                 </jcr:jqom>
                 <c:forEach var="node" items="${additionalMaps.nodes}">
                         <sitemap>
