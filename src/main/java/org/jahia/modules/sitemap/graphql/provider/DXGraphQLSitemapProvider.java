@@ -21,38 +21,23 @@
  *
  * ==========================================================================================
  */
-package org.jahia.modules.sitemap.utils;
+package org.jahia.modules.sitemap.graphql.provider;
 
-import org.jahia.modules.sitemap.config.ConfigService;
-import org.jahia.osgi.FrameworkService;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
+import org.jahia.modules.graphql.provider.dxm.DXGraphQLExtensionsProvider;
+import org.osgi.service.component.annotations.Component;
 
-import java.util.List;
+import org.jahia.modules.sitemap.graphql.extensions.MutationExtension;
+
+import java.util.Arrays;
+import java.util.Collection;
 
 /**
- * Utility functions for getting information from the configuration
- *
- * @author nonico
+ * Main GraphQL extension provider for the sitemap API
  */
-public final class ConfigServiceUtils {
-    public static List<String> getSearchEngines() {
-        return getConfigService().getSearchEngines();
-    }
-
-    public static List<String> getIncludedContentTypes() {
-        return getConfigService().getIncludeContentTypes();
-    }
-
-    private static ConfigService getConfigService() {
-        final BundleContext bundleContext = FrameworkUtil.getBundle(ConfigService.class).getBundleContext();
-        final ServiceReference<ConfigService> serviceReference = FrameworkService.getBundleContext()
-                .getServiceReference(ConfigService.class);
-        return bundleContext.getService(serviceReference);
-    }
-
-    public static long getCacheDuration() {
-        return getConfigService().getCacheDuration();
+@Component(immediate = true, service= DXGraphQLExtensionsProvider.class)
+public class DXGraphQLSitemapProvider implements DXGraphQLExtensionsProvider {
+    @Override
+    public Collection<Class<?>> getExtensions() {
+        return Arrays.asList(MutationExtension.class);
     }
 }

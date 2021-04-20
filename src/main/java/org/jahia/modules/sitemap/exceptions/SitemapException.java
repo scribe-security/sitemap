@@ -21,38 +21,17 @@
  *
  * ==========================================================================================
  */
-package org.jahia.modules.sitemap.utils;
+package org.jahia.modules.sitemap.exceptions;
 
-import org.jahia.modules.sitemap.config.ConfigService;
-import org.jahia.osgi.FrameworkService;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
-
-import java.util.List;
+import graphql.ErrorType;
+import org.jahia.modules.graphql.provider.dxm.BaseGqlClientException;
 
 /**
- * Utility functions for getting information from the configuration
- *
- * @author nonico
+ * Custom sitemap exception
  */
-public final class ConfigServiceUtils {
-    public static List<String> getSearchEngines() {
-        return getConfigService().getSearchEngines();
-    }
+public class SitemapException extends BaseGqlClientException {
 
-    public static List<String> getIncludedContentTypes() {
-        return getConfigService().getIncludeContentTypes();
-    }
-
-    private static ConfigService getConfigService() {
-        final BundleContext bundleContext = FrameworkUtil.getBundle(ConfigService.class).getBundleContext();
-        final ServiceReference<ConfigService> serviceReference = FrameworkService.getBundleContext()
-                .getServiceReference(ConfigService.class);
-        return bundleContext.getService(serviceReference);
-    }
-
-    public static long getCacheDuration() {
-        return getConfigService().getCacheDuration();
+    public SitemapException(String errorMessage, Throwable error) {
+        super(errorMessage, error, ErrorType.DataFetchingException);
     }
 }

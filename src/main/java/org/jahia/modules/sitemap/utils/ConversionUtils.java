@@ -23,36 +23,12 @@
  */
 package org.jahia.modules.sitemap.utils;
 
-import org.jahia.modules.sitemap.config.ConfigService;
-import org.jahia.osgi.FrameworkService;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.FrameworkUtil;
-import org.osgi.framework.ServiceReference;
-
-import java.util.List;
-
 /**
- * Utility functions for getting information from the configuration
- *
- * @author nonico
+ * Utility class for simple conversions
  */
-public final class ConfigServiceUtils {
-    public static List<String> getSearchEngines() {
-        return getConfigService().getSearchEngines();
-    }
+public class ConversionUtils {
 
-    public static List<String> getIncludedContentTypes() {
-        return getConfigService().getIncludeContentTypes();
-    }
-
-    private static ConfigService getConfigService() {
-        final BundleContext bundleContext = FrameworkUtil.getBundle(ConfigService.class).getBundleContext();
-        final ServiceReference<ConfigService> serviceReference = FrameworkService.getBundleContext()
-                .getServiceReference(ConfigService.class);
-        return bundleContext.getService(serviceReference);
-    }
-
-    public static long getCacheDuration() {
-        return getConfigService().getCacheDuration();
+    public static long longVal(Long l, long defaultValue) {
+        return l == null ? defaultValue : l.longValue();
     }
 }
