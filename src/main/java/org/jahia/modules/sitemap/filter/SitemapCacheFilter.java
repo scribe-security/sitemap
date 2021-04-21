@@ -27,12 +27,8 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jahia.api.Constants;
 import org.jahia.modules.sitemap.utils.CacheUtils;
-import org.jahia.modules.sitemap.utils.ConfigServiceUtils;
 import org.jahia.services.cache.CacheHelper;
-import org.jahia.services.content.JCRCallback;
-import org.jahia.services.content.JCRNodeWrapper;
-import org.jahia.services.content.JCRSessionWrapper;
-import org.jahia.services.content.JCRTemplate;
+import org.jahia.services.content.*;
 import org.jahia.services.render.RenderContext;
 import org.jahia.services.render.Resource;
 import org.jahia.services.render.filter.AbstractFilter;
@@ -48,6 +44,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 
+import org.jahia.modules.sitemap.utils.ConversionUtils;
+import org.jahia.modules.sitemap.constant.SitemapConstant;
+
 /**
  * Filter that creates sitemap file nodes for caching.
  *
@@ -60,9 +59,6 @@ import java.nio.charset.StandardCharsets;
 public class SitemapCacheFilter extends AbstractFilter {
 
     private static final Logger logger = LoggerFactory.getLogger(SitemapCacheFilter.class);
-
-    private static final long EXPIRATION = ConfigServiceUtils.getCacheDuration();
-
 
     @Activate
     public void activate() {
@@ -152,7 +148,20 @@ public class SitemapCacheFilter extends AbstractFilter {
     }
 
     public boolean isValidCache(JCRNodeWrapper cacheNode) {
-        return (cacheNode != null) && !CacheUtils.isExpired(cacheNode, EXPIRATION);
+        long expiration = 4 * 60 * 60 * 1000L; // Default to 4 hours
+        if (cacheNode == null) return false;
+        try {
+            JCRNodeWrapper siteNode = cacheNode.getResolveSite();
+            if (siteNode != null) {
+                JCRPropertyWrapper cacheDurationProperty = siteNode.getProperty(SitemapConstant.SITEMAP_CACHE_DURATION);
+                String propertyValue = ConversionUtils.getValueFromJCRProperty(cacheDurationProperty);
+                expiration = ConversionUtils.toMilliSecondsLong(propertyValue, expiration);
+            }
+        } catch (RepositoryException e) {
+            logger.error("Unable to retrieve node information.");
+            return false;
+        }
+        return !CacheUtils.isExpired(cacheNode, expiration);
     }
 
     public JCRNodeWrapper getCacheNode(JCRNodeWrapper sitemapNode) throws RepositoryException {
