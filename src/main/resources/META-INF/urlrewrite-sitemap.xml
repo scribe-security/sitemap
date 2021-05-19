@@ -10,4 +10,9 @@
         <to last="true">/cms/render/live/%{attribute:siteDefaultLanguage}/sites/%{attribute:jahiaSiteKeyForCurrentServerName}/home.sitemap.xml</to>
     </rule>
 
+    <rule>
+        <from>^/(.*)/sitemap-lang.xml$</from>
+        <to>/$1/sitemap.lang.xml</to>
+    </rule>
+
 </urlrewrite>
