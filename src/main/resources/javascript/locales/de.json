@@ -12,13 +12,12 @@
     },
     "settingSection": {
       "sitemapIndexFileSection": {
-        "title": "Sitemap Index Datei",
-        "description": "Die Sitemap Index Datei referenziert alle anderen Sitemap Dateien: sprachabhängige Sitemaps und gesonderte Sitemaps.",
-        "sitemapIndexXML": "sitemap-index.xml"
+        "title": "Haupt-Sitemap",
+        "description": "Die Haupt-Sitemap referenziert alle weiteren Sitemaps: Sprach-Sitemaps und gesonderte Sitemaps",
+        "missing": "Es wurde noch keine Sitemap generiert"
       },
       "sitemapIndexURLSection": {
         "title": "Sitemap Index URL",
-        "description": "Fügen Sie die öffentliche URL Ihrer Sitemap Index Datei hinzu. Das ist notwendig, da möglicherweise Proxy-Server verwendet werden und die URL Ihrer Site verändern.",
         "chipLabel": "Verpflichtend"
       },
       "updateIntervalSection": {
