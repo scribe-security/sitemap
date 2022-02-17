@@ -1,6 +1,6 @@
 import { BasePage } from './base.page'
 
-class SitemapPage extends BasePage {
+export class SitemapPage extends BasePage {
     elements = {
         saveButton: "button[type='submit']",
         sitemapRootUrlInput: "input[id='sitemapIndexURL']",
@@ -8,26 +8,26 @@ class SitemapPage extends BasePage {
         dialogFlushCacheSpan: 'flush cache',
     }
 
-    goTo(siteKey = 'mySite', lang = 'en') {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    static visit(siteKey = 'mySite', lang = 'en') {
         cy.goTo(`/jahia/jcontent/${siteKey}/${lang}/apps/siteSettingsSeo/sitemap`)
-        return this
+        return new SitemapPage()
     }
 
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     inputSitemapRootURL(serverName = 'http://localhost:8080') {
         cy.get(this.elements.sitemapRootUrlInput).clear().type(serverName)
-        return this
     }
 
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     clickOnSave() {
         cy.get(this.elements.saveButton).should('not.be.disabled')
-        cy.get(this.elements.saveButton).clickAttached()
-        return this
+        cy.get(this.elements.saveButton).click()
     }
 
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     clickFlushCache() {
-        cy.contains(this.htmlElements.span, this.elements.headerFlushCacheSpan).clickAttached()
-        cy.contains(this.htmlElements.span, this.elements.dialogFlushCacheSpan).clickAttached()
+        cy.contains(this.htmlElements.span, this.elements.headerFlushCacheSpan, { timeout: 10000 }).click()
+        cy.contains(this.htmlElements.span, this.elements.dialogFlushCacheSpan, { timeout: 10000 }).click()
     }
 }
-
-export const sitemapPage = new SitemapPage()
