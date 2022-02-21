@@ -24,7 +24,13 @@
     <c:set var="serverName" value="${sitemap:getServerName(urlHostServerName)}"/>
 
     <jcr:nodeProperty var="lastModified" node="${urlNode}" name="jcr:lastModified"/>
-
+    <c:if test="${param[\"sitemap_debug\"] eq \"true\"}">
+    <%-- we add some current node informations for debug --%>
+    <!--node path: ${urlNode.path}-->
+    <!--node url: ${urlNode.url}-->
+    <!--node type: ${urlNode.primaryNodeTypeName}-->
+    <!--node uuid: ${urlNode.identifier}-->
+    </c:if>
     <loc>${serverName}${finalUrl}</loc>
     <lastmod><fmt:formatDate value="${lastModified.date.time}" pattern="yyyy-MM-dd"/></lastmod>
 
