@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.jahia.modules.sitemap.constant.SitemapConstant.*;
@@ -50,7 +49,6 @@ public class ConfigServiceImpl implements ConfigService {
     private static final Logger logger = LoggerFactory.getLogger(ConfigServiceImpl.class);
     private static final String PROP_FORMAT="%s%s%s";
     private static final String EMPTY_STRING="";
-    public static final long MIN_FREQUENCY = 1L;
     private Map<String, String> properties;
 
     public ConfigServiceImpl() {
@@ -59,7 +57,9 @@ public class ConfigServiceImpl implements ConfigService {
 
     @Activate
     public void activate(Map<String, ?> props) {
-        properties = initProperties(props);
+        properties = props.keySet().stream()
+                .filter(propsKey -> !props.get(propsKey).toString().isEmpty())
+                .collect(Collectors.toMap(propsKey -> propsKey, propsKey -> props.get(propsKey).toString(), (a, b) -> b));
         logger.info("Sitemap configuration activated");
     }
 
@@ -69,26 +69,16 @@ public class ConfigServiceImpl implements ConfigService {
     }
 
     @Override
-    public void setProperties(Map<String,String> properties) {
-        this.properties = properties;
-    }
-
-    @Override
     public List<String> getSearchEngines() {
         final String searchEnginesStr = properties.getOrDefault(String.format(PROP_FORMAT, SITEMAP_PARENT_PROPERTY, DOT, SEARCH_ENGINES),
                 EMPTY_STRING);
         return new ArrayList<>(Arrays.asList(searchEnginesStr.split(",")));
     }
 
-    @Override public List<String> getIncludeContentTypes() {
+    @Override
+    public List<String> getIncludeContentTypes() {
         final String includedContentTypes = properties.getOrDefault(String.format(PROP_FORMAT, SITEMAP_PARENT_PROPERTY, DOT, INCLUDED_CONTENT_TYPES),
                 EMPTY_STRING);
         return new ArrayList<>(Arrays.asList(includedContentTypes.split(",")));
-    }
-
-    private Map<String, String> initProperties(Map<String,?> props) {
-        return props.keySet().stream()
-                .filter(propsKey -> !props.get(propsKey).toString().isEmpty())
-                .collect(Collectors.toMap(propsKey -> propsKey, propsKey -> props.get(propsKey).toString(), (a, b) -> b));
     }
 }

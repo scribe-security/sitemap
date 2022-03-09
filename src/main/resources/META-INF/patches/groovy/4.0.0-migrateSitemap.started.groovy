@@ -1,9 +1,6 @@
 package groovy
 
-import org.jahia.services.content.JCRCallback
-import org.jahia.services.content.JCRNodeWrapper
-import org.jahia.services.content.JCRSessionWrapper
-import org.jahia.services.content.JCRTemplate
+import org.jahia.services.content.*
 import org.jahia.services.content.decorator.JCRSiteNode
 import org.jahia.services.sites.JahiaSitesService
 
@@ -57,11 +54,25 @@ def updateJmixNoindexMixin(JCRSessionWrapper session, String sitePath) {
     }
 }
 
+def removeSitemapResourceNodes(JCRSessionWrapper session, String sitePath, String nodetype) {
+    logger.info("Clean up of " + nodetype + " node on " + session.getWorkspace().getName() + " workspace");
+    QueryResult qr = session.getWorkspace().getQueryManager().createQuery("select * from [" + nodetype + "] as sel where isdescendantnode" +
+            "(sel,['" + sitePath + "'])", Query.JCR_SQL2).execute();
+    NodeIterator nodeIterator = qr.getNodes();
+    for (JCRNodeIteratorWrapper nodeIt = nodeIterator; nodeIt.hasNext();) {
+        JCRNodeWrapper node = nodeIt.next();
+        logger.info("Node of type "  + nodetype + " with path [" + node.getPath() + "] will be removed");
+        node.remove();
+    }
+}
+
 def processNodes(List<JCRSiteNode> sites, JCRSessionWrapper session) {
     for (JCRSiteNode site : sites) {
         removeJntSitemapNodes(session, site.getPath());
         removeJmixSitemapMixin(session, site.getPath());
-        updateJmixNoindexMixin(session, site.getPath())
+        updateJmixNoindexMixin(session, site.getPath());
+        removeSitemapResourceNodes(session, site.getPath(), "jseont:sitemapResource");
+        removeSitemapResourceNodes(session, site.getPath(), "jseont:sitemap");
     }
     session.save();
 }
