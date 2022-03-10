@@ -3,6 +3,7 @@ package groovy
 import org.jahia.services.content.*
 import org.jahia.services.content.decorator.JCRSiteNode
 import org.jahia.services.sites.JahiaSitesService
+import org.jahia.settings.SettingsBean
 
 import javax.jcr.NodeIterator
 import javax.jcr.RepositoryException
@@ -85,8 +86,20 @@ def runProgram() {
             processNodes(getApplicableSiteNodes(session) as List<JCRSiteNode>, session);
         }
     });
-    System.out.println("************** Sitemap migration completed **************");
-    System.out.println("************** Do not forget to verify and publish your site **************");
+}
+
+def runProgram() {
+    if (SettingsBean.getInstance().isProcessingServer()) {
+        System.out.println("************** Starting Sitemap migration **************");
+        JCRTemplate.getInstance().doExecuteWithSystemSession(new JCRCallback<Void>() {
+            @Override
+            Void doInJCR(JCRSessionWrapper session) throws RepositoryException {
+                processNodes(getApplicableSiteNodes(session) as List<JCRSiteNode>, session);
+            }
+        });
+        System.out.println("************** Sitemap migration completed **************");
+        System.out.println("************** Do not forget to verify and publish your site **************");
+    }
 }
 
 runProgram();
