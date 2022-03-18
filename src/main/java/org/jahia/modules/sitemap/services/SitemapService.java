@@ -25,22 +25,35 @@ package org.jahia.modules.sitemap.services;
 
 import org.jahia.modules.sitemap.exceptions.SitemapException;
 
-import javax.jcr.RepositoryException;
-
 public interface SitemapService {
 
-    /**
-     * TODO add java doc
-     * @param sitemapIndexXMLUrlPath
-     * @return
-     * @throws SitemapException
-     */
     Boolean sendSitemapXMLUrlPathToSearchEngines(String sitemapIndexXMLUrlPath) throws SitemapException;
 
     /**
-     * TODO add java doc
-     * @param siteKey
-     * @throws RepositoryException
+     * Flush sitemap Ehcache.
      */
-    void flushCache(String siteKey) throws RepositoryException;
+    void flushSitemapEhCache();
+
+    /**
+     * Adds sitemap cache entry
+     * @param targetSitemapCacheKey (mandatory)
+     * @param sitemap (mandatory)
+     * @param sitemapCacheDuration (mandatory)
+     */
+    void addSitemapEhCacheEntry(String targetSitemapCacheKey, String sitemap, String sitemapCacheDuration);
+
+    /**
+     * Checks if an entry cache exist for a giving sitemap cache key.
+     * @param targetSitemapCacheKey (mandatory)
+     * @return true if a sitemap cache key exist.
+     */
+    boolean isSitemapEhCacheEntryExist(String targetSitemapCacheKey);
+
+    /**
+     * Gets sitemap entry cache value for a giving sitemap cache key.
+     * @param targetSitemapCacheKey (mandatory)
+     * @return sitemap cache content as String.
+     */
+    String getSitemapEhCacheEntryValue(String targetSitemapCacheKey);
+
 }
