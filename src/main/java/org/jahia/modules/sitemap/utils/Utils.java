@@ -58,6 +58,29 @@ public final class Utils {
     private Utils() {
     }
 
+    public static Set<String> getSitemapRoots(RenderContext renderContext, String locale) throws RepositoryException {
+        Set<String> results = new HashSet<>();
+        JahiaUser guestUser = ServicesRegistry.getInstance().getJahiaUserManagerService().lookupUser(Constants.GUEST_USERNAME).getJahiaUser();
+        // Add site node to results
+        if (renderContext.getSite().getActiveLiveLanguages().contains(locale)) {
+            results.add(renderContext.getSite().getPath());
+        }
+        JCRTemplate.getInstance().doExecute(guestUser, Constants.LIVE_WORKSPACE, Locale.forLanguageTag(locale), session -> {
+
+            String query = String.format("SELECT * FROM [jseomix:sitemapResource] as sel WHERE ISDESCENDANTNODE(sel, '%s')", renderContext.getSite().getPath());
+            QueryResult queryResult = getQuery(session, query);
+            NodeIterator ni = queryResult.getNodes();
+            while (ni.hasNext()) {
+                JCRNodeWrapper n = (JCRNodeWrapper) ni.nextNode();
+                if (isValidEntry(n, renderContext)) {
+                    results.add(n.getPath());
+                }
+            }
+            return null;
+        });
+        return results;
+    }
+
     /**
      * @return sitemap entries that are publicly accessible
      */
@@ -129,7 +152,7 @@ public final class Utils {
             siteKey = ServerNameToSiteMapper.getSiteKeyByServerName(httpServletRequest);
             if (StringUtils.isEmpty(siteKey)) {
                 // If not set, look into the url for any "sites"
-                siteKey = StringUtils.substringBetween(httpServletRequest.getRequestURI(), "/site/", "/");
+                siteKey = StringUtils.substringBetween(httpServletRequest.getRequestURI(), "/sites/", "/");
                 // At last, get default site.
                 if (StringUtils.isEmpty(siteKey) || jahiaSitesService.getSiteByKey(siteKey) == null) {
                     siteKey = jahiaSitesService.getDefaultSite().getSiteKey();
