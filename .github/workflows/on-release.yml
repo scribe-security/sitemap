@@ -50,7 +50,7 @@ jobs:
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
 
-      - uses: jahia/jahia-modules-action/update-module-signature@v1
+      - uses: jahia/jahia-modules-action/update-signature@v1
         with:
           nexus_username: ${{ secrets.NEXUS_USERNAME }}
           nexus_password: ${{ secrets.NEXUS_PASSWORD }}
