@@ -23,7 +23,9 @@
  */
 package org.jahia.modules.sitemap.utils;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.jackrabbit.util.Text;
 import org.jahia.api.Constants;
 import org.jahia.modules.sitemap.beans.SitemapEntry;
 import org.jahia.registries.ServicesRegistry;
@@ -36,6 +38,8 @@ import org.jahia.services.seo.urlrewrite.ServerNameToSiteMapper;
 import org.jahia.services.sites.JahiaSitesService;
 import org.jahia.services.usermanager.JahiaUser;
 import org.jahia.settings.SettingsBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
@@ -52,6 +56,7 @@ import java.util.stream.Collectors;
  */
 public final class Utils {
 
+    private static final Logger logger = LoggerFactory.getLogger(Utils.class);
     private static final String DEDICATED_SITEMAP_MIXIN = "jseomix:sitemapResource";
     private static final String NO_INDEX_MIXIN = "jseomix:noIndex";
 
@@ -73,7 +78,7 @@ public final class Utils {
             while (ni.hasNext()) {
                 JCRNodeWrapper n = (JCRNodeWrapper) ni.nextNode();
                 if (isValidEntry(n, renderContext)) {
-                    results.add(n.getPath());
+                    results.add(htmlEscape(n.getPath(), false));
                 }
             }
             return null;
@@ -124,12 +129,12 @@ public final class Utils {
                 }
                 JCRNodeWrapper nodeInOtherLocale = sessionInOtherLocale.getNode(node.getPath());
                 if (nodeInOtherLocale != null && isValidEntry(nodeInOtherLocale, renderContext)) {
-                    linksInOtherLanguages.add(new SitemapEntry(nodeInOtherLocale.getPath(), nodeInOtherLocale.getUrl(), new SimpleDateFormat("yyyy-MM-dd").format(node.getLastModifiedAsDate()), otherLocale, null));
+                    linksInOtherLanguages.add(new SitemapEntry(htmlEscape(nodeInOtherLocale.getPath(), false), htmlEscape(nodeInOtherLocale.getUrl(), true), new SimpleDateFormat("yyyy-MM-dd").format(node.getLastModifiedAsDate()), otherLocale, null));
                 }
                 return null;
             });
         }
-        return new SitemapEntry(node.getPath(), node.getUrl(), new SimpleDateFormat("yyyy-MM-dd").format(node.getLastModifiedAsDate()), currentLocale, linksInOtherLanguages);
+        return new SitemapEntry(htmlEscape(node.getPath(), false), htmlEscape(node.getUrl(), true), new SimpleDateFormat("yyyy-MM-dd").format(node.getLastModifiedAsDate()), currentLocale, linksInOtherLanguages);
     }
 
     private static boolean isValidEntry(JCRNodeWrapper node, RenderContext renderContext) throws RepositoryException {
@@ -171,6 +176,14 @@ public final class Utils {
         }
         request.setAttribute("jahiaSitemapSiteKey", siteKey);
         request.setAttribute("jahiaSitemapSiteLanguage", siteDefaultLanguage);
+    }
+
+    private static String htmlEscape(String path, boolean unescapeText) {
+        String toEncode = path;
+        if (unescapeText) {
+            toEncode = Text.unescape(path);
+        }
+        return StringEscapeUtils.escapeHtml(toEncode);
     }
 
 }
