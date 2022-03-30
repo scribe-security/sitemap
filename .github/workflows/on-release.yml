@@ -33,13 +33,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.GH_SSH_PRIVATE_KEY_JAHIACI }}
 
-      # Generates a changelog by comparing the latest created tag with HEAD
-      # Commits this file back to the repository's main branch
-      - uses: jahia/jahia-modules-action/generate-changelog@v1
-        name: Generate Changelog
-        with:
-          github_api_token: ${{ secrets.GH_API_TOKEN }}
-
       - uses: jahia/jahia-modules-action/release@v1
         name: Release Module
         with:
