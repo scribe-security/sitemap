@@ -104,7 +104,7 @@ const SitemapPanelApp = ({client, t}) => {
             try {
                 sitemapHostname = new URL(values.sitemapIndexURL).origin;
                 console.info(sitemapHostname + 'will be set as base URL for sitemap');
-                isValidHostname = sitemapHostname && sitemapHostname !== "null"
+                isValidHostname = sitemapHostname && sitemapHostname !== 'null';
             } catch (_) {
                 isValidHostname = false;
             }
