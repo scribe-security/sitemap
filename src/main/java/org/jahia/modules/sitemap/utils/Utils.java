@@ -23,7 +23,10 @@
  */
 package org.jahia.modules.sitemap.utils;
 
+import org.apache.commons.httpclient.URIException;
+import org.apache.commons.httpclient.util.URIUtil;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jahia.api.Constants;
 import org.jahia.modules.sitemap.beans.SitemapEntry;
 import org.jahia.registries.ServicesRegistry;
@@ -43,6 +46,8 @@ import javax.jcr.query.Query;
 import javax.jcr.query.QueryResult;
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -56,6 +61,27 @@ public final class Utils {
     private static final String NO_INDEX_MIXIN = "jseomix:noIndex";
 
     private Utils() {
+    }
+
+    public static String encodeSitemapLink(String URIPath, boolean shouldBeDecodedFirst) throws URIException, UnsupportedEncodingException {
+        String encodedURIPath = URIPath;
+        if (shouldBeDecodedFirst) {
+            // example: /cms/render/live/fr/sites/digitall/home/test-parent/test2%3c%c3%bc.html
+            // First we decode it, since the node.getUrl(); is encoding the path using JackRabbit Text.escapePath();
+            encodedURIPath = URLDecoder.decode(encodedURIPath, "UTF-8");
+        }
+
+        // example is now: /cms/render/live/fr/sites/digitall/home/test-parent/test2<ü.html
+        // Now we need first to escape XML entities to follow google recommendations -> XML 1.0 is used here
+        encodedURIPath = StringEscapeUtils.escapeXml10(encodedURIPath);
+
+        // example is now: /cms/render/live/fr/sites/digitall/home/test-parent/test2&lt;ü.html
+        // Now we just need to re encode into UTF-8
+        encodedURIPath = URIUtil.encodePath(encodedURIPath, "UTF-8");
+
+        // example is now: /cms/render/live/fr/sites/digitall/home/test-parent/test2&lt;%c3%bc.html
+        // we have correctly encoded XML entity: (> into &lt;) and correctly encoded character: (ü into %c3%bc)
+        return encodedURIPath;
     }
 
     public static Set<String> getSitemapRoots(RenderContext renderContext, String locale) throws RepositoryException {
