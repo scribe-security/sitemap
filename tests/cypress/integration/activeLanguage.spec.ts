@@ -11,7 +11,7 @@ const filterLang = 'de'
 const filterPath = `/${filterLang}${sitePath}/`
 
 describe('Testing sitemap only contains language', () => {
-    let filteredUrlsforLang = 0;
+    let filteredUrlsforLang = 0
     before('Configure sitemap', () => {
         configureSitemap(sitePath, siteMapRootUrl)
 
@@ -23,7 +23,7 @@ describe('Testing sitemap only contains language', () => {
                 propertyNames: ['sitemapIndexURL', 'sitemapCacheDuration'],
             },
             queryFile: 'graphql/jcrGetSitemapConfig.graphql',
-        }).should((response: any) => {
+        }).should((response) => {
             const r = response?.data?.jcr?.nodeByPath
             cy.log(JSON.stringify(r))
             expect(r.id).not.to.be.null
@@ -56,7 +56,7 @@ describe('Testing sitemap only contains language', () => {
             cy.task('parseSitemap', { url: sitemapUrl }).then((urls: Array<string>) => {
                 const filteredLang = urls.filter((u) => u.includes(filterPath))
                 cy.log(`Sitemap contains ${filteredLang.length} URLs with path: ${filterPath}`)
-                filteredUrlsforLang = filteredLang.length;
+                filteredUrlsforLang = filteredLang.length
                 expect(filteredLang.length).to.be.greaterThan(0)
             })
         })
@@ -123,7 +123,9 @@ describe('Testing sitemap only contains language', () => {
                 cy.log(`Sitemap contains ${filteredLang.length} URLs with path: ${filterPath}`)
                 expect(filteredLang.length).to.be.greaterThan(0)
 
-                cy.log(`It should container the same number of URLs than before disabling the language: ${filteredUrlsforLang}`)
+                cy.log(
+                    `It should container the same number of URLs than before disabling the language: ${filteredUrlsforLang}`,
+                )
                 expect(filteredLang.length).to.equal(filteredUrlsforLang)
             })
         })

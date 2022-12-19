@@ -1,10 +1,10 @@
-export const publishAndWaitJobEnding = (path: string) => {
+export const publishAndWaitJobEnding = (path: string): void => {
     cy.apollo({
         variables: {
             pathOrId: path,
-            languages: ["en"],
+            languages: ['en'],
             publishSubNodes: true,
-            includeSubTree: true
+            includeSubTree: true,
         },
         mutationFile: 'graphql/jcrPublishNode.graphql',
     })
@@ -32,5 +32,6 @@ export const publishAndWaitJobEnding = (path: string) => {
         },
     )
     // Wait 2 seconds for server sync after publication
+    // eslint-disable-next-line cypress/no-unnecessary-waiting
     cy.wait(2000)
 }

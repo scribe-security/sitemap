@@ -1,4 +1,4 @@
-export const configureSitemap = (sitePath: string, siteMapRootUrl: string) => {
+export const configureSitemap = (sitePath: string, siteMapRootUrl: string): void => {
     cy.log(`Configuring sitemap: Verifying if a configuration is present for ${sitePath}`)
     cy.apollo({
         variables: {
@@ -7,7 +7,7 @@ export const configureSitemap = (sitePath: string, siteMapRootUrl: string) => {
             propertyNames: ['sitemapIndexURL', 'sitemapCacheDuration'],
         },
         queryFile: 'graphql/jcrGetSitemapConfig.graphql',
-    }).then((response: any) => {
+    }).then((response) => {
         const r = response?.data?.jcr?.nodeByPath
         expect(r.id).not.to.be.null
 
