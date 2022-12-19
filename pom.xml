@@ -188,7 +188,7 @@
                     <includeBomSerialNumber>true</includeBomSerialNumber>
                     <includeCompileScope>true</includeCompileScope>
                     <includeRuntimeScope>true</includeRuntimeScope>
-                    <includeProvidedScope>true</includeProvidedScope>
+                    <includeProvidedScope>false</includeProvidedScope>
                     <includeSystemScope>false</includeSystemScope>
                     <includeTestScope>false</includeTestScope>
                     <includeLicenseText>false</includeLicenseText>
